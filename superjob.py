@@ -1,6 +1,10 @@
 import requests
 from pprint import pprint
 from itertools import count
+from environs import Env
+
+env = Env()
+env.read_env()
 
 
 def training_all_vacancies(language):
@@ -15,7 +19,7 @@ def training_all_vacancies(language):
             "keyword": language
         }
         response = requests.get('https://api.superjob.ru/2.0/vacancies/', headers={
-            'X-Api-App-Id': 'v3.r.137668029.6bddc51f228c0e3cafc1b3d27f9f5b9e211619de.f8cb577a0fc2a43dfbd70de44a34042caedd1f1b'},
+            'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")},
                                 params=params)
         response.raise_for_status()
         payload = response.json()
