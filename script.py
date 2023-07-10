@@ -37,7 +37,7 @@ def displays_results_table(vacancy_research, table_title):
 
 
 def handles_pages_vacancies_hh(language):
-    """Обрабатывает несколько страниц с вакансиями на hh.ru
+    """Обрабатывает несколько страниц с вакансиями на hh.ru.
 
     В виде словаря возвращает:
     average_salary -- среднюю зарплату по обработанным вакансиям
@@ -78,7 +78,7 @@ def handles_pages_vacancies_hh(language):
 
 
 def predict_rub_salary_hh(page):
-    """Обрабатывает одну страницу с вакансиямм на hh.ru
+    """Обрабатывает одну страницу с вакансиямм на hh.ru.
 
     Возвращает кортеж в виде:
     vacancies_salary -- список со всеми зарплатами со страницы
@@ -107,7 +107,7 @@ def predict_rub_salary_hh(page):
 
 
 def handles_pages_vacancies_sj(language):
-    """Обрабатывает несколько страниц с вакансиями на superjob.ru
+    """Обрабатывает несколько страниц с вакансиями на superjob.ru.
 
     В виде словаря возвращает:
     average_salary -- среднюю зарплату по обработанным вакансиям
@@ -149,7 +149,7 @@ def handles_pages_vacancies_sj(language):
 
 
 def predict_rub_salary_sj(page):
-    """Обрабатывает одну страницу с вакансиямм на superjob.ru
+    """Обрабатывает одну страницу с вакансиямм на superjob.ru.
 
     Возвращает кортеж в виде:
     vacancies_salary -- список со всеми зарплатами со страницы
