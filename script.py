@@ -1,5 +1,4 @@
 import requests
-from pprint import pprint
 from itertools import count
 from environs import Env
 from terminaltables import AsciiTable
@@ -19,6 +18,7 @@ languages = ["JavaScript",
 
 
 def displays_results_table(vacancy_research, table_title):
+    """Выводит результаты исследования вакансий в виде таблицы."""
     table_columns = [("Язык программирования",
                       "Вакансий найдено", "Вакансий обработано",
                       "Средняя зарплата")
@@ -37,6 +37,13 @@ def displays_results_table(vacancy_research, table_title):
 
 
 def handles_pages_vacancies_hh(language):
+    """Обрабатывает несколько страниц с вакансиями на hh.ru
+
+    В виде словаря возвращает:
+    average_salary -- среднюю зарплату по обработанным вакансиям
+    vacancies_found -- количество ваканасий
+    vacancies_processed -- количество обработанных вакансий
+    """
     pages_processed = []
     salaries = []
     vacancies_processed = []
@@ -71,6 +78,12 @@ def handles_pages_vacancies_hh(language):
 
 
 def predict_rub_salary_hh(page):
+    """Обрабатывает одну страницу с вакансиямм на hh.ru
+
+    Возвращает кортеж в виде:
+    vacancies_salary -- список со всеми зарплатами со страницы
+    vacancies_processed -- количество обработанных вакансий на одной странице
+    """
     vacancies = page["items"]
     salaries = []
     for vacancy in vacancies:
@@ -94,6 +107,13 @@ def predict_rub_salary_hh(page):
 
 
 def handles_pages_vacancies_sj(language):
+    """Обрабатывает несколько страниц с вакансиями на superjob.ru
+
+    В виде словаря возвращает:
+    average_salary -- среднюю зарплату по обработанным вакансиям
+    vacancies_found -- количество ваканасий
+    vacancies_processed -- количество обработанных вакансий
+    """
     pages_processed = []
     salaries = []
     vacancies_processed = []
@@ -129,6 +149,12 @@ def handles_pages_vacancies_sj(language):
 
 
 def predict_rub_salary_sj(page):
+    """Обрабатывает одну страницу с вакансиямм на superjob.ru
+
+    Возвращает кортеж в виде:
+    vacancies_salary -- список со всеми зарплатами со страницы
+    vacancies_processed -- количество обработанных вакансий на одной странице
+    """
     vacancies = page["objects"]
     salaries = []
     for vacancy in vacancies:
@@ -155,5 +181,6 @@ for language in languages:
     language_statistics_hh[language] = handles_pages_vacancies_hh(language)
     language_statistics_sj[language] = handles_pages_vacancies_sj(language)
 
-displays_results_table(language_statistics_hh, "HeadHunter Moscow")
-displays_results_table(language_statistics_sj, "SuperJob Moscow")
+if __name__ == '__main':
+    displays_results_table(language_statistics_hh, "HeadHunter Moscow")
+    displays_results_table(language_statistics_sj, "SuperJob Moscow")
