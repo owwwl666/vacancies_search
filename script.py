@@ -10,7 +10,7 @@ LANGUAGES = [
     "Ruby",
     "PHP",
     "C++",
-    "C#", ""
+    "C#",
     "1C",
 ]
 
@@ -73,7 +73,7 @@ def predict_rub_salary_hh(page):
     """Обрабатывает одну страницу с вакансиямм на hh.ru.
 
     Возвращает кортеж в виде:
-    vacancies_salary -- список со всеми зарплатами со страницы
+    salaries -- список со всеми зарплатами со страницы
     vacancies_processed -- количество обработанных вакансий на одной странице
     """
     vacancies = page["items"]
@@ -93,16 +93,15 @@ def predict_rub_salary_hh(page):
 
             salaries.append(expected_salary)
 
-    vacancies_salary = salaries if salaries else []
     vacancies_processed = page["per_page"]
-    return vacancies_salary, vacancies_processed
+    return salaries, vacancies_processed
 
 
 def predict_rub_salary_sj(page):
     """Обрабатывает одну страницу с вакансиямм на superjob.ru.
 
     Возвращает кортеж в виде:
-    vacancies_salary -- список со всеми зарплатами со страницы
+    salaries -- список со всеми зарплатами со страницы
     vacancies_processed -- количество обработанных вакансий на одной странице
     """
     vacancies = page["objects"]
@@ -119,9 +118,8 @@ def predict_rub_salary_sj(page):
             if salary_from and salary_to:
                 salaries.append((salary_from + salary_to) / 2)
 
-    vacancies_salary = salaries if salaries else []
     vacancies_processed = len(vacancies)
-    return vacancies_salary, vacancies_processed
+    return salaries, vacancies_processed
 
 
 if __name__ == '__main__':
