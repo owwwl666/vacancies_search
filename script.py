@@ -3,15 +3,10 @@ from itertools import count
 from environs import Env
 from terminaltables import AsciiTable
 
-languages = ["JavaScript",
-             "Java",
-             "Python",
-             "Ruby",
-             "PHP",
-             "C++",
-             "C#",
-             "1C",
-             ]
+languages = [
+    "JavaScript", "Java", "Python", "Ruby",
+    "PHP", "C++", "C#", "1C",
+]
 
 
 def displays_results_table(vacancy_research, table_title):
@@ -79,13 +74,13 @@ def predict_rub_salary_hh(page):
     salaries = []
     for vacancy in vacancies:
         salary = vacancy["salary"]
-        if salary is None or salary["currency"] != "RUR":
+        if not salary or salary["currency"] != "RUR":
             continue
         else:
             salary_from, salary_to = salary["from"], salary["to"]
-            if salary_from is None:
+            if not salary_from:
                 expected_salary = salary_to * 0.8
-            elif salary_to is None:
+            elif not salary_to:
                 expected_salary = salary_from * 1.2
             else:
                 expected_salary = (salary_from + salary_to) / 2
