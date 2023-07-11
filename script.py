@@ -78,6 +78,7 @@ def predict_rub_salary_hh(page):
     """
     vacancies = page["items"]
     salaries = []
+    vacancies_processed = 0
     for vacancy in vacancies:
         salary = vacancy["salary"]
         if not salary or salary["currency"] != "RUR":
@@ -92,8 +93,8 @@ def predict_rub_salary_hh(page):
                 expected_salary = (salary_from + salary_to) / 2
 
             salaries.append(expected_salary)
+            vacancies_processed += 1
 
-    vacancies_processed = page["per_page"]
     return salaries, vacancies_processed
 
 
@@ -106,6 +107,7 @@ def predict_rub_salary_sj(page):
     """
     vacancies = page["objects"]
     salaries = []
+    vacancies_processed = 0
     for vacancy in vacancies:
         salary_from, salary_to = vacancy.get("payment_from"), vacancy.get("payment_to")
         if vacancy["currency"] == "rub":
@@ -117,8 +119,8 @@ def predict_rub_salary_sj(page):
                 salaries.append(salary_from * 1.2)
             if salary_from and salary_to:
                 salaries.append((salary_from + salary_to) / 2)
+            vacancies_processed += 1
 
-    vacancies_processed = len(vacancies)
     return salaries, vacancies_processed
 
 
