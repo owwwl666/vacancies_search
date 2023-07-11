@@ -34,7 +34,7 @@ def displays_results_table(vacancy_research, table_title):
     print(summary_table.table)
 
 
-def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, headers):
+def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, headers, vacancies):
     """Обрабатывает несколько страниц с вакансиями.
 
     В виде словаря возвращает:
@@ -54,7 +54,7 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
             break
 
     for page in pages_processed:
-        salaries_page, vacancies_processed_page = predict_rub_salary(page)
+        salaries_page, vacancies_processed_page = predict_rub_salary(page[vacancies])
         salaries.extend(salaries_page)
         vacancies_processed.append(vacancies_processed_page)
     average_salary = int(sum(salaries) / len(salaries)) \
@@ -69,14 +69,14 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
     }
 
 
-def predict_rub_salary_hh(page):
+def predict_rub_salary_hh(vacancies_page):
     """Обрабатывает одну страницу с вакансиямм на hh.ru.
 
     Возвращает кортеж в виде:
     salaries -- список со всеми зарплатами со страницы
     vacancies_processed -- количество обработанных вакансий на одной странице
     """
-    vacancies = page["items"]
+    vacancies = vacancies_page
     salaries = []
     vacancies_processed = 0
     for vacancy in vacancies:
@@ -98,14 +98,14 @@ def predict_rub_salary_hh(page):
     return salaries, vacancies_processed
 
 
-def predict_rub_salary_sj(page):
+def predict_rub_salary_sj(vacancies_page):
     """Обрабатывает одну страницу с вакансиямм на superjob.ru.
 
     Возвращает кортеж в виде:
     salaries -- список со всеми зарплатами со страницы
     vacancies_processed -- количество обработанных вакансий на одной странице
     """
-    vacancies = page["objects"]
+    vacancies = vacancies_page
     salaries = []
     vacancies_processed = 0
     for vacancy in vacancies:
@@ -142,7 +142,8 @@ if __name__ == '__main__':
             predict_rub_salary=predict_rub_salary_hh,
             total_vacancies="found",
             url='https://api.hh.ru/vacancies/',
-            headers={}
+            headers={},
+            vacancies="items"
         )
 
         language_statistics_sj[language] = process_pages_vacancies(
@@ -153,7 +154,8 @@ if __name__ == '__main__':
             predict_rub_salary=predict_rub_salary_sj,
             total_vacancies="total",
             url='https://api.superjob.ru/2.0/vacancies/',
-            headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")}
+            headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")},
+            vacancies="objects"
         )
 
     displays_results_table(language_statistics_hh, "HeadHunter Moscow")
