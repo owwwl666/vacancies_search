@@ -34,7 +34,7 @@ def displays_results_table(vacancy_research, table_title):
     print(summary_table.table)
 
 
-def handles_pages_vacancies(params, func, total_vacancies, url, headers):
+def process_pages_vacancies(params, func, total_vacancies, url, headers):
     """Обрабатывает несколько страниц с вакансиями.
 
     В виде словаря возвращает:
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     language_statistics_sj = {}
 
     for language in LANGUAGES:
-        language_statistics_hh[language] = handles_pages_vacancies(
+        language_statistics_hh[language] = process_pages_vacancies(
             params={
                 "text": f"Программист {language}",
                 "area": '1',
@@ -145,7 +145,7 @@ if __name__ == '__main__':
             headers={}
         )
 
-        language_statistics_sj[language] = handles_pages_vacancies(
+        language_statistics_sj[language] = process_pages_vacancies(
             params={
                 "town": "Москва",
                 "keyword": language
