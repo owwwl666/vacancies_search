@@ -3,7 +3,7 @@ from itertools import count
 from environs import Env
 from terminaltables import AsciiTable
 
-languages = [
+LANGUAGES = [
     "JavaScript",
     "Java",
     "Python",
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     language_statistics_hh = {}
     language_statistics_sj = {}
 
-    for language in languages:
+    for language in LANGUAGES:
         language_statistics_hh[language] = handles_pages_vacancies(
             params={
                 "text": f"Программист {language}",
