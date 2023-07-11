@@ -1,7 +1,7 @@
 import requests
-from itertools import count
 from environs import Env
 from terminaltables import AsciiTable
+from math import ceil
 
 LANGUAGES = [
     "JavaScript",
@@ -45,13 +45,15 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
     pages_processed = []
     salaries = []
     vacancies_processed = []
-    for page in count(0):
+    vacancies_found = requests.get(url, params=params, headers=headers).json()[total_vacancies]
+    pages = ceil(vacancies_found / 20) if vacancies_found < 2000 else 100
+    page = 0
+    while page < pages:
         params |= {"page": page}
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         pages_processed.append(response.json())
-        if page == 3:
-            break
+        page += 1
 
     for page in pages_processed:
         salaries_page, vacancies_processed_page = predict_rub_salary(page[vacancies])
@@ -60,7 +62,6 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
     average_salary = int(sum(salaries) / len(salaries)) \
         if salaries else None
     vacancies_processed = sum(vacancies_processed)
-    vacancies_found = pages_processed[0][total_vacancies]
 
     return {
         "average_salary": average_salary,
