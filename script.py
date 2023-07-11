@@ -34,7 +34,7 @@ def displays_results_table(vacancy_research, table_title):
     print(summary_table.table)
 
 
-def process_pages_vacancies(params, func, total_vacancies, url, headers):
+def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, headers):
     """Обрабатывает несколько страниц с вакансиями.
 
     В виде словаря возвращает:
@@ -54,7 +54,7 @@ def process_pages_vacancies(params, func, total_vacancies, url, headers):
             break
 
     for page in pages_processed:
-        salaries_page, vacancies_processed_page = func(page)
+        salaries_page, vacancies_processed_page = predict_rub_salary(page)
         salaries.extend(salaries_page)
         vacancies_processed.append(vacancies_processed_page)
     average_salary = int(sum(salaries) / len(salaries)) \
@@ -139,7 +139,7 @@ if __name__ == '__main__':
                 "area": '1',
                 "professional_role": '96',
             },
-            func=predict_rub_salary_hh,
+            predict_rub_salary=predict_rub_salary_hh,
             total_vacancies="found",
             url='https://api.hh.ru/vacancies/',
             headers={}
@@ -150,7 +150,7 @@ if __name__ == '__main__':
                 "town": "Москва",
                 "keyword": language
             },
-            func=predict_rub_salary_sj,
+            predict_rub_salary=predict_rub_salary_sj,
             total_vacancies="total",
             url='https://api.superjob.ru/2.0/vacancies/',
             headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")}
