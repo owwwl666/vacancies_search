@@ -36,8 +36,8 @@ def displays_results_table(vacancy_research, table_title):
     print(summary_table.table)
 
 
-def handles_pages_vacancies_hh(language):
-    """Обрабатывает несколько страниц с вакансиями на hh.ru.
+def handles_pages_vacancies(params, func, total_vacancies, url, headers):
+    """Обрабатывает несколько страниц с вакансиями.
 
     В виде словаря возвращает:
     average_salary -- среднюю зарплату по обработанным вакансиям
@@ -48,27 +48,21 @@ def handles_pages_vacancies_hh(language):
     salaries = []
     vacancies_processed = []
     for page in count(0):
-
-        params = {
-            "page": page,
-            "text": f"Программист {language}",
-            "area": '1',
-            "professional_role": '96',
-        }
-        response = requests.get('https://api.hh.ru/vacancies/', params=params)
+        params |= {"page": page}
+        response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         pages_processed.append(response.json())
         if page == 3:
             break
 
     for page in pages_processed:
-        salaries_page, vacancies_processed_page = predict_rub_salary_hh(page)
+        salaries_page, vacancies_processed_page = func(page)
         salaries.extend(salaries_page)
         vacancies_processed.append(vacancies_processed_page)
     average_salary = int(sum(salaries) / len(salaries)) \
         if salaries else None
     vacancies_processed = sum(vacancies_processed)
-    vacancies_found = pages_processed[0]["found"]
+    vacancies_found = pages_processed[0][total_vacancies]
 
     return {
         "average_salary": average_salary,
@@ -106,48 +100,6 @@ def predict_rub_salary_hh(page):
     return vacancies_salary, vacancies_processed
 
 
-def handles_pages_vacancies_sj(language):
-    """Обрабатывает несколько страниц с вакансиями на superjob.ru.
-
-    В виде словаря возвращает:
-    average_salary -- среднюю зарплату по обработанным вакансиям
-    vacancies_found -- количество ваканасий
-    vacancies_processed -- количество обработанных вакансий
-    """
-    pages_processed = []
-    salaries = []
-    vacancies_processed = []
-    for page in count(0):
-
-        params = {
-            "page": page,
-            "town": "Москва",
-            "keyword": language
-        }
-        response = requests.get('https://api.superjob.ru/2.0/vacancies/', headers={
-            'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")},
-                                params=params)
-        response.raise_for_status()
-        pages_processed.append(response.json())
-        if page == 3:
-            break
-
-    for page in pages_processed:
-        salaries_page, vacancies_processed_page = predict_rub_salary_sj(page)
-        salaries.extend(salaries_page)
-        vacancies_processed.append(vacancies_processed_page)
-    average_salary = int(sum(salaries) / len(salaries)) \
-        if salaries else None
-    vacancies_processed = sum(vacancies_processed)
-    vacancies_found = pages_processed[0]["total"]
-
-    return {
-        "average_salary": average_salary,
-        "vacancies_found": vacancies_found,
-        "vacancies_processed": vacancies_processed,
-    }
-
-
 def predict_rub_salary_sj(page):
     """Обрабатывает одну страницу с вакансиямм на superjob.ru.
 
@@ -178,9 +130,29 @@ language_statistics_hh = {}
 language_statistics_sj = {}
 
 for language in languages:
-    language_statistics_hh[language] = handles_pages_vacancies_hh(language)
-    language_statistics_sj[language] = handles_pages_vacancies_sj(language)
+    language_statistics_hh[language] = handles_pages_vacancies(
+        params={
+            "text": f"Программист {language}",
+            "area": '1',
+            "professional_role": '96',
+        },
+        func=predict_rub_salary_hh,
+        total_vacancies="found",
+        url='https://api.hh.ru/vacancies/',
+        headers={}
+    )
 
-if __name__ == '__main':
+    language_statistics_sj[language] = handles_pages_vacancies(
+        params={
+            "town": "Москва",
+            "keyword": language
+        },
+        func=predict_rub_salary_sj,
+        total_vacancies="total",
+        url='https://api.superjob.ru/2.0/vacancies/',
+        headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")}
+    )
+
+if __name__ == '__main__':
     displays_results_table(language_statistics_hh, "HeadHunter Moscow")
     displays_results_table(language_statistics_sj, "SuperJob Moscow")
