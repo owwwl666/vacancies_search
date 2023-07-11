@@ -85,14 +85,7 @@ def predict_rub_salary_hh(vacancies_page):
             continue
         else:
             salary_from, salary_to = salary["from"], salary["to"]
-            if not salary_from:
-                expected_salary = salary_to * 0.8
-            elif not salary_to:
-                expected_salary = salary_from * 1.2
-            else:
-                expected_salary = (salary_from + salary_to) / 2
-
-            salaries.append(expected_salary)
+            salaries.append(predict_salary(salary_from, salary_to))
             vacancies_processed += 1
 
     return salaries, vacancies_processed
@@ -113,15 +106,27 @@ def predict_rub_salary_sj(vacancies_page):
         if vacancy["currency"] == "rub":
             if not (salary_from and salary_to):
                 continue
-            if not salary_from and salary_to:
-                salaries.append(salary_to * 0.8)
-            if not salary_to and salary_from:
-                salaries.append(salary_from * 1.2)
-            if salary_from and salary_to:
-                salaries.append((salary_from + salary_to) / 2)
-            vacancies_processed += 1
+            else:
+                salaries.append(predict_salary(salary_from, salary_to))
+                vacancies_processed += 1
 
     return salaries, vacancies_processed
+
+
+def predict_salary(salary_from, salary_to):
+    """Вычисляет среднюю зарплату в вакансии.
+
+    salary_from -- зарплата 'от'
+    salary_to -- зарплата 'до'
+    """
+    if not salary_from:
+        salary = salary_to * 0.8
+    elif not salary_to:
+        salary = salary_from * 1.2
+    else:
+        salary = (salary_from + salary_to) / 2
+
+    return salary
 
 
 if __name__ == '__main__':
