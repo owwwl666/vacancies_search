@@ -4,8 +4,14 @@ from environs import Env
 from terminaltables import AsciiTable
 
 languages = [
-    "JavaScript", "Java", "Python", "Ruby",
-    "PHP", "C++", "C#", "1C",
+    "JavaScript",
+    "Java",
+    "Python",
+    "Ruby",
+    "PHP",
+    "C++",
+    "C#", ""
+    "1C",
 ]
 
 
