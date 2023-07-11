@@ -3,9 +3,6 @@ from itertools import count
 from environs import Env
 from terminaltables import AsciiTable
 
-env = Env()
-env.read_env()
-
 languages = ["JavaScript",
              "Java",
              "Python",
@@ -126,33 +123,37 @@ def predict_rub_salary_sj(page):
     return vacancies_salary, vacancies_processed
 
 
-language_statistics_hh = {}
-language_statistics_sj = {}
-
-for language in languages:
-    language_statistics_hh[language] = handles_pages_vacancies(
-        params={
-            "text": f"Программист {language}",
-            "area": '1',
-            "professional_role": '96',
-        },
-        func=predict_rub_salary_hh,
-        total_vacancies="found",
-        url='https://api.hh.ru/vacancies/',
-        headers={}
-    )
-
-    language_statistics_sj[language] = handles_pages_vacancies(
-        params={
-            "town": "Москва",
-            "keyword": language
-        },
-        func=predict_rub_salary_sj,
-        total_vacancies="total",
-        url='https://api.superjob.ru/2.0/vacancies/',
-        headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")}
-    )
-
 if __name__ == '__main__':
+
+    env = Env()
+    env.read_env()
+
+    language_statistics_hh = {}
+    language_statistics_sj = {}
+
+    for language in languages:
+        language_statistics_hh[language] = handles_pages_vacancies(
+            params={
+                "text": f"Программист {language}",
+                "area": '1',
+                "professional_role": '96',
+            },
+            func=predict_rub_salary_hh,
+            total_vacancies="found",
+            url='https://api.hh.ru/vacancies/',
+            headers={}
+        )
+
+        language_statistics_sj[language] = handles_pages_vacancies(
+            params={
+                "town": "Москва",
+                "keyword": language
+            },
+            func=predict_rub_salary_sj,
+            total_vacancies="total",
+            url='https://api.superjob.ru/2.0/vacancies/',
+            headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")}
+        )
+
     displays_results_table(language_statistics_hh, "HeadHunter Moscow")
     displays_results_table(language_statistics_sj, "SuperJob Moscow")
