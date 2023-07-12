@@ -56,9 +56,9 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
         page += 1
 
     for page in pages_processed:
-        salaries_page, vacancies_processed_page = predict_rub_salary(page[vacancies])
-        salaries.extend(salaries_page)
-        vacancies_processed.append(vacancies_processed_page)
+        one_page_salaries, one_page_vacancies_processed = predict_rub_salary(page[vacancies])
+        salaries.extend(one_page_salaries)
+        vacancies_processed.append(one_page_vacancies_processed)
     average_salary = int(sum(salaries) / len(salaries)) \
         if salaries else None
     vacancies_processed = sum(vacancies_processed)
@@ -144,6 +144,7 @@ if __name__ == '__main__':
                 "text": f"Программист {language}",
                 "area": '1',
                 "professional_role": '96',
+                "period": 10,
             },
             predict_rub_salary=predict_rub_salary_hh,
             total_vacancies="found",
@@ -155,7 +156,7 @@ if __name__ == '__main__':
         language_statistics_sj[language] = process_pages_vacancies(
             params={
                 "town": "Москва",
-                "keyword": language
+                "keyword": language,
             },
             predict_rub_salary=predict_rub_salary_sj,
             total_vacancies="total",
