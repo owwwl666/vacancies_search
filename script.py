@@ -1,7 +1,6 @@
 import requests
 from environs import Env
 from terminaltables import AsciiTable
-from math import ceil
 
 LANGUAGES = [
     "JavaScript",
@@ -34,7 +33,7 @@ def displays_results_table(vacancy_research, table_title):
     print(summary_table.table)
 
 
-def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, headers, vacancies):
+def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, headers, vacancies, total_pages):
     """Обрабатывает несколько страниц с вакансиями.
 
     В виде словаря возвращает:
@@ -45,15 +44,16 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
     pages_processed = []
     salaries = []
     vacancies_processed = []
-    vacancies_found = requests.get(url, params=params, headers=headers).json()[total_vacancies]
-    pages = ceil(vacancies_found / 20) if vacancies_found < 2000 else 100
     page = 0
-    while page < pages:
+    while True:
         params |= {"page": page}
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         pages_processed.append(response.json())
+        pages = response.json()[total_pages]
         page += 1
+        if page >= pages or not pages:
+            break
 
     for page in pages_processed:
         one_page_salaries, one_page_vacancies_processed = predict_rub_salary(page[vacancies])
@@ -61,6 +61,7 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
         vacancies_processed.append(one_page_vacancies_processed)
     average_salary = int(sum(salaries) / len(salaries)) \
         if salaries else None
+    vacancies_found = pages_processed[0].get(total_vacancies)
     vacancies_processed = sum(vacancies_processed)
 
     return {
@@ -81,7 +82,7 @@ def predict_rub_salary_hh(vacancies_page):
     salaries = []
     vacancies_processed = 0
     for vacancy in vacancies:
-        salary = vacancy["salary"]
+        salary = vacancy.get("salary")
         if not salary or salary["currency"] != "RUR":
             continue
         else:
@@ -144,25 +145,28 @@ if __name__ == '__main__':
                 "text": f"Программист {language}",
                 "area": '1',
                 "professional_role": '96',
-                "period": 10,
+                "per_page": 100,
             },
             predict_rub_salary=predict_rub_salary_hh,
             total_vacancies="found",
             url='https://api.hh.ru/vacancies/',
             headers={},
-            vacancies="items"
+            vacancies="items",
+            total_pages="pages"
         )
 
         language_statistics_sj[language] = process_pages_vacancies(
             params={
                 "town": "Москва",
                 "keyword": language,
+                "count": 100
             },
             predict_rub_salary=predict_rub_salary_sj,
             total_vacancies="total",
             url='https://api.superjob.ru/2.0/vacancies/',
             headers={'X-Api-App-Id': env.str("SUPERJOB_SECRET_KEY")},
-            vacancies="objects"
+            vacancies="objects",
+            total_pages="more"
         )
 
     displays_results_table(language_statistics_hh, "HeadHunter Moscow")
