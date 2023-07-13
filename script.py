@@ -49,8 +49,9 @@ def process_pages_vacancies(params, predict_rub_salary, total_vacancies, url, he
         params |= {"page": page}
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
-        pages_processed.append(response.json())
-        pages = response.json()[total_pages]
+        page_vacancies = response.json()
+        pages_processed.append(page_vacancies)
+        pages = page_vacancies[total_pages]
         page += 1
         if page >= pages or not pages:
             break
